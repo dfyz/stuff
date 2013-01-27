@@ -1,23 +1,24 @@
 import Control.Applicative
 import Control.Monad
 import Data.Array
-import Data.Fixed
+import Data.Maybe
 import Data.Time.Clock
 import System.IO
-import System.Random
 import Text.Printf
- 
-readInt :: IO Int
-readInt = readLn
- 
-readIntPair :: IO [Int]
-readIntPair = parseLine <$> getLine
-    where
-        parseLine = (map read) . words
 
-getAnswer' prefixSums from to = (prefixSums ! to) - (prefixSums ! (from - 1))
-getAnswer prefixSums (from:to:_) = getAnswer' prefixSums from to
-getAnswerForPair prefixSums (from, to) = getAnswer' prefixSums from to
+import qualified Data.ByteString.Char8 as B
+
+int = fst . fromJust . B.readInt
+
+readInt :: IO Int
+readInt = int <$> B.getLine
+
+readIntPair :: IO [Int]
+readIntPair = parseLine <$> B.getLine
+    where
+        parseLine = (map int) . B.words
+
+getAnswer prefixSums (from:to:_) = (prefixSums ! to) - (prefixSums ! (from - 1))
 
 doMain = do
     n <- readInt
