@@ -27,22 +27,6 @@ doMain = do
     queries <- replicateM m readIntPair
     mapM_ (print . getAnswer prefixSums) queries
 
-{- doMain2 = do
-    let n = 10000
-    print n
-    mapM_ print $ take n $ randomRs (-n, n) $ mkStdGen 42
-    let m = 10*n
-    print m
-    mapM_ (\(x, y) -> printf "%d %d\n" (min x y) (max x y)) (take m $ (zip <*> tail) $ randomRs (1, n) $ mkStdGen 23)
-
-doMain3 = do
-    let n = 10000
-    let numbers = take n $ randomRs (-n, n) $ mkStdGen 42
-    let prefixSums = listArray (0, n) (scanl (+) 0 numbers)
-    let m = 10*n
-    let queries = map (\(x, y) -> ((min x y), (max x y))) $ take m $ (zip <*> tail) $ randomRs (1, n) $ mkStdGen 23
-    mapM_ (print . getAnswerForPair prefixSums) queries -}
-
 main = do
     start <- getCurrentTime
     _ <- doMain
