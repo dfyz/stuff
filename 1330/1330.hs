@@ -24,10 +24,8 @@ doMain = do
     numbers <- replicateM n readInt
     let prefixSums = listArray (0, n) (scanl (+) 0 numbers)
     m <- readInt
-    replicateM_ m $ do
-        line <- getLine
-        let [x, y] = (map read) $ words $ line
-        print $ getAnswer' prefixSums x y
+    queries <- replicateM m readIntPair
+    mapM_ (print . getAnswer prefixSums) queries
 
 {- doMain2 = do
     let n = 10000
