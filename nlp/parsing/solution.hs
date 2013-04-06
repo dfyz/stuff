@@ -1,7 +1,6 @@
 import Data.Array
 import Data.Function
 import Data.List
-import Debug.Trace
 import Control.Applicative
 import Control.Monad
 import Data.Maybe
@@ -86,12 +85,10 @@ parse binaryRules qb qu nonterminals sentence wc = cky (bounds sentence) "SBARQ"
 logProb :: Integer -> Integer -> Double
 logProb a b = log2 ((fromIntegral a) / (fromIntegral b))
 
-parseSentence line =
-	let
+parseSentence line = listArray (1, length w) w
+	where
 		w = words line
-		len = length w
-	in
-		listArray (1, len) w
+		
 
 fstTriple (x, _, _) = x
 
