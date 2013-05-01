@@ -70,10 +70,50 @@ void RunEM(Corpus spCorpus, Corpus enCorpus, TProbs tProbs, QProbs qProbs, bool 
 	}
 }
 
+void Dump(TProbs tProbs, QProbs qProbs, string fileName) {
+	auto tFile = File(fileName ~ ".tprobs", "w");
+	foreach(spWord, enWords; tProbs) {
+		foreach(enWord, val; enWords) {
+			tFile.writefln("%s %s %s", spWord, enWord, val);
+		}
+	}
+
+	auto qFile = File(fileName ~ ".qprobs", "w");
+	foreach(spLength; qProbs.keys) {
+		foreach(enLength; qProbs[spLength].keys) {
+			foreach(spIdx; qProbs[spLength][enLength].keys) {
+				foreach(enIdx, val; qProbs[spLength][enLength][spIdx]) {
+					qFile.writefln("%s %s %s %s %s", spLength, enLength, spIdx, enIdx, val);
+				}
+			}
+		}
+	}
+}
+
+void Load(TProbs tProbs, QProbs qProbs, string fileName) {
+	auto tFile = File(fileName ~ ".tprobs");
+	string spWord;
+	string enWord;
+	double tProb;
+	while (tFile.readf("%s %s %s", &spWord, &enWord, &tProb) > 0) {
+		tProbs[spWord][enWord] = tProb;
+	}
+
+	auto qFile = File(fileName ~ ".qprobs");
+	ulong spLength;
+	ulong enLength;
+	ulong spIdx;
+	ulong enIdx;
+	double qProb;
+	while (qFile.readf("%s %s %s %s %s", &spLength, &enLength, &spIdx, &enIdx, &qProb) > 0) {
+		qProbs[spLength][enLength][spIdx][enIdx] = qProb;
+	}
+}
+
 void main(string[] args) {
 	stderr.writeln("Reading corpora");
-	auto spCorpus = ParseCorpus("corpus.es", false);
-	auto enCorpus = ParseCorpus("corpus.en", true);
+	auto spCorpus = ParseCorpus(args[3], false);
+	auto enCorpus = ParseCorpus(args[4], true);
 
 	assert(spCorpus.length == enCorpus.length);
 
@@ -112,6 +152,8 @@ void main(string[] args) {
 
 	RunEM(spCorpus, enCorpus, tProbs, qProbs, false);
 	RunEM(spCorpus, enCorpus, tProbs, qProbs, true);
+
+	Dump(tProbs, qProbs, args[5]);
 
 	stderr.writeln("Reading test data");
 	spCorpus = ParseCorpus(args[1], false);
