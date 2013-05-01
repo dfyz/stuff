@@ -2,31 +2,38 @@ import common;
 
 import std.stdio;
 
-void main(string[] args) {
+alias ulong[ulong][ulong] AlignmentSet;
+
+auto GetOneWayAlignments(string probsFileName, string foreignCorpusFileName, string nativeCorpusFileName) {
 	TProbs tProbs;
 	QProbs qProbs;
 
-	LoadProbs(tProbs, qProbs, args[3]);
+	LoadProbs(tProbs, qProbs, probsFileName);
 
 	stderr.writeln("Reading test data");
-	auto spCorpus = ParseCorpus(args[1], false);
-	auto enCorpus = ParseCorpus(args[2], true);
-	foreach(i; 0 .. spCorpus.length) {
-		auto spLength = spCorpus[i].length;
-		auto enLength = enCorpus[i].length;
-		foreach(spIdx, spWord; spCorpus[i]) {
-			auto bestProb = qProbs[spLength][enLength][spIdx][0] * tProbs[spWord][nullWord];
-			ulong bestEnIdx = 0;
-			foreach(enIdx, enWord; enCorpus[i][1..$]) {
-				auto newProb = qProbs[spLength][enLength][spIdx][enIdx + 1] * tProbs[spWord][enWord];
+	auto foreignCorpus = ParseCorpus(foreignCorpusFileName, false);
+	auto nativeCorpus = ParseCorpus(nativeCorpusFileName, true);
+	AlignmentSet result;
+	foreach(i; 0 .. foreignCorpus.length) {
+		auto foreignLength = foreignCorpus[i].length;
+		auto nativeLength = nativeCorpus[i].length;
+		foreach(foreignIdx, foreignWord; foreignCorpus[i]) {
+			auto bestProb = qProbs[foreignLength][nativeLength][foreignIdx][0] * tProbs[foreignWord][nullWord];
+			ulong bestNativeIdx = 0;
+			foreach(nativeIdx, nativeWord; nativeCorpus[i][1..$]) {
+				auto newProb = qProbs[foreignLength][nativeLength][foreignIdx][nativeIdx + 1] * tProbs[foreignWord][nativeWord];
 				if (newProb > bestProb) {
 					bestProb = newProb;
-					bestEnIdx = enIdx + 1;
+					bestNativeIdx = nativeIdx + 1;
 				}
 			}
-			if (bestEnIdx > 0) {
-				writefln("%s %s %s", i + 1, bestEnIdx, spIdx + 1);			
+			if (bestNativeIdx > 0) {
+				result[i + 1][foreignIdx + 1] = bestNativeIdx;
 			}
 		}
-	}
+	}	
+}
+
+void main(string[] args) {
+
 }
