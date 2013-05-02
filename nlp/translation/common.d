@@ -1,6 +1,7 @@
 module common;
 
 import std.array;
+import std.conv;
 import std.stdio;
 import std.string;
 
@@ -39,22 +40,14 @@ void DumpProbs(TProbs tProbs, QProbs qProbs, string fileName) {
 	}
 }
 
-void LoadProbs(TProbs tProbs, QProbs qProbs, string fileName) {
-	auto tFile = File(fileName ~ ".tprobs");
-	string spWord;
-	string enWord;
-	double tProb;
-	while (tFile.readf("%s %s %s", &spWord, &enWord, &tProb) > 0) {
-		tProbs[spWord][enWord] = tProb;
+void LoadProbs(TProbs* tProbs, QProbs* qProbs, string fileName) {
+	foreach(line; File(fileName ~ ".tprobs").byLine()) {
+		auto tokens = cast(string[])(line.dup.split(" "));
+		(*tProbs)[tokens[0]][tokens[1]] = to!double(tokens[2]);
 	}
 
-	auto qFile = File(fileName ~ ".qprobs");
-	ulong spLength;
-	ulong enLength;
-	ulong spIdx;
-	ulong enIdx;
-	double qProb;
-	while (qFile.readf("%s %s %s %s %s", &spLength, &enLength, &spIdx, &enIdx, &qProb) > 0) {
-		qProbs[spLength][enLength][spIdx][enIdx] = qProb;
+	foreach(line; File(fileName ~ ".qprobs").byLine()) {
+		auto tokens = cast(string[])(line.dup.split());
+		(*qProbs)[to!ulong(tokens[0])][to!ulong(tokens[1])][to!ulong(tokens[2])][to!ulong(tokens[3])] = to!double(tokens[4]);
 	}
 }
