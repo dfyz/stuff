@@ -51,19 +51,36 @@ ETag GetTagAt(const vector<ETag>& tags, size_t pos, size_t offset) {
 
 vector<TFeatureName> ComputeFeatures(ETag u, ETag v, ETag w, const vector<string>& sentence, size_t pos) {
 	vector<TFeatureName> result;
+
 	TFeatureName f1;
 	f1.push_back("TRIGRAM");
 	f1.push_back(TagToString(u));
 	f1.push_back(TagToString(v));
 	f1.push_back(TagToString(w));
 	result.push_back(f1);
-	if (pos <= sentence.size()) {
-		TFeatureName f2;
-		f2.push_back("TAG");
-		f2.push_back(sentence[pos - 1]);
-		f2.push_back(TagToString(w));
-		result.push_back(f2);
+
+	if (pos > sentence.size()) {
+		return result;
 	}
+
+	const std::string& word = sentence[pos - 1];
+	TFeatureName f2;
+	f2.push_back("TAG");
+	f2.push_back(word);
+	f2.push_back(TagToString(w));
+	result.push_back(f2);
+
+	for (size_t suffixLength = 1; suffixLength <= 3; suffixLength++) {
+		if (word.size() < suffixLength) {
+			break;
+		}
+		TFeatureName fSuffix;
+		fSuffix.push_back("SUFFIX");
+		fSuffix.push_back(word.substr(word.size() - suffixLength));
+		fSuffix.push_back(TagToString(w));
+		result.push_back(fSuffix);
+	}
+
 	return result;
 }
 
@@ -217,7 +234,7 @@ vector<ETag> MostProbableTagging(const TFeatures& features, const vector<string>
 typedef vector<std::pair<vector<std::string>, vector<ETag> > > TTrainingSet;
 
 void RunPerceptron(TFeatures& features, const TTrainingSet& learn) {
-	static const size_t iterationCount = 5;
+	static const size_t iterationCount = 12;
 	for (size_t iter = 1; iter <= iterationCount; ++iter) {
 		std::cerr << "Perceptron: starting iteration " << iter << std::endl;
 		size_t progress = 0;
