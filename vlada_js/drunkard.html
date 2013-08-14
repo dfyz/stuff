@@ -1,0 +1,64 @@
+<html>
+<head>
+    <title>Drunkard</title>
+    <meta charset="utf-8"></meta>
+</head>
+<body>
+    <script>
+        var cardToString = function(card) {
+            return card[0] + card[1];
+        };
+
+        var randomIndex = function(upperBound) {
+            return Math.floor(Math.random() * (upperBound + 1));
+        };
+
+        var randomShuffle = function(array) {
+            for (var i = array.length - 1; i >= 1; i--) {
+                var j = randomIndex(i);
+                var tmp = array[i];
+                array[i] = array[j];
+                array[j] = tmp;
+            }
+        };
+
+        var allCards = [];
+        var suits = "♠♥♦♣";
+
+        for (var i = 2; i <= 14; i++) {
+            for (var j = 0; j < suits.length; j++) {
+                var currentCard = [i, suits.substr(j, 1)];
+                allCards.push(currentCard);
+            }
+        }
+
+        randomShuffle(allCards);
+        var obj = {};
+        var propertyCount = 0;
+        for (var i = 0; i < allCards.length; i++) {
+            console.log((i + 1) + ": " + cardToString(allCards[i]));
+            obj[cardToString(allCards[i])] = null;
+        }
+
+        for (var prop in obj) {
+            if (obj.hasOwnProperty(prop)) {
+                propertyCount++;
+            }
+        }
+        console.log(propertyCount); 
+
+        var playerCount = 4;
+        var hands = [];
+        var handSize = allCards.length / playerCount;
+        var start = 0;
+        var end = handSize;
+        for (var i = 0; i < playerCount; i++) {
+            hands.push(allCards.slice(start, end));
+            start = start + handSize;
+            end = end + handSize;
+        }
+
+        console.log(hands);
+    </script>
+</body>
+</html>
