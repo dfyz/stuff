@@ -2,8 +2,15 @@
 <head>
     <title>Drunkard</title>
     <meta charset="utf-8"></meta>
+    <style>
+    ul {list-style: none;}
+    /*li {height: 140px; width: 120px; border: 1px solid #333; text-align: center;*/
+        /*display: inline-block; line-height: 140px;}*/
+    </style>
 </head>
 <body>
+    <div id="cardslist">
+    </div>
     <script>
         var cardToString = function(card) {
             return card[0] + card[1];
@@ -59,6 +66,18 @@
         }
 
         console.log(hands);
+
+        var cardslist = document.getElementById("cardslist");
+        for (var i = 0; i < hands.length; i++) {
+            var ul = document.createElement('ul');
+            for (var j = 0; j < hands[i].length; j++) {
+                var li = document.createElement('li');
+                ul.appendChild(li);
+                li.innerHTML = hands[i][j];
+            }
+            cardslist.appendChild(ul);
+        }
     </script>
+    
 </body>
 </html>
